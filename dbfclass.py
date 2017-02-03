@@ -22,6 +22,8 @@ FIELD_FORMAT = '<11sc4xBB14x'
 
 
 def recode_to_stream(f, fields, recodes):
+    """f is BytesIO, fields is list of field and first value is del_flag,
+       recodes is a list of recode"""
     for reno, recode in enumerate(recodes, start=1):
         for i, field in enumerate(fields):
             if i == 0:
@@ -43,7 +45,7 @@ def recode_to_stream(f, fields, recodes):
 
 
 def head_to_stream(f, fields, recnum):
-    """f is ByteIO, fields is list of field, recnum is total recode"""
+    """f is BytesIO, fields is list of field, recnum is total recode"""
     # 写Dbf文件头
     ver = 3
     now = datetime.datetime.now()
