@@ -16,7 +16,6 @@ import struct
 import datetime
 import io
 
-
 FIELD = col.namedtuple('Field', "name type lenth dec")
 HEAD_FORMAT = '<BBBBLHH20x'
 FIELD_FORMAT = '<11sc4xBB14x'
@@ -52,7 +51,7 @@ def head_to_stream(f, fields, recnum):
     # 写Dbf文件头
     ver = 3
     now = datetime.datetime.now()
-    yr, mon, day = now.year - 1900, now.month, now.day
+    yr, mon, day = [now.year - 1900, now.month, now.day]
     numfields = len(fields)
     lenheader = numfields * 32 + 33
     lenrecord = sum(field.lenth for field in fields)
@@ -81,7 +80,6 @@ class DbfSseWriter(object):
         else:
             self.fields = [FIELD('del_flag', 'C', 1, 0)]
 
-
     def write_to_stream(self, recodes):
         recnum = len(recodes)
         if not recnum:
@@ -92,10 +90,9 @@ class DbfSseWriter(object):
 
     def stream_to_file(self, file_stream=None):
         if not file_stream:
-            return  False
+            return False
         stream_len = len(self.stream)
         file_stream.truncate(stream_len)
         file_stream.seek(0)
         file_stream.write(self.stream.getvalue())
         return True
-
