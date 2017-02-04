@@ -16,7 +16,7 @@ print(sl1)
 sl2 = 4
 print('{0}.{1}'.format(sl2, sl1))
 sl1 = 4
-if sl1==4:
+if sl1 == 4:
     print(sl1)
 elif sl2 == 4:
     print('hello wrld')
