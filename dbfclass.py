@@ -14,6 +14,7 @@
 import collections as col
 import struct
 import datetime
+import io
 
 
 FIELD = col.namedtuple('Field', "name type lenth dec")
@@ -33,7 +34,9 @@ def recode_to_stream(f, fields, recodes):
             if len(recode[i]) > field.lenth:
                 raise "记录{3:d}长度：{1:d}大于字段{0}设定长度：{2:d}，内容：{4}".format(
                     field.name, len(recode[i]), field.lenth, reno, recode[i])
-            if field.type == 'N' or field.type == 'F':
+            if reno == 1 and i == 5:
+                value = str(recode[i])[:field.lenth].ljust(field.lenth, ' ').encode()
+            elif field.type == 'N' or field.type == 'F':
                 value = str(recode[i]).rjust(field.lenth, ' ').encode()
             elif field.type == 'D':
                 value = recode[i].strftime('%Y%m%d').encode()
@@ -58,9 +61,41 @@ def head_to_stream(f, fields, recnum):
 
     # 写Dbf字段
     for field in fields:
+        if field.name == "del_flag":
+            continue
         name = field.name.ljust(11, '\x00').encode()
         fld = struct.pack(FIELD_FORMAT, name, field.type[0].encode(), field.lenth, field.dec)
         f.write(fld)
 
     # 结束文件头
     f.write(b'\r')
+
+
+class DbfSseWriter(object):
+    def __init__(self, field_list=None):
+        self.stream = io.BytesIO()
+        if field_list:
+            self.fields = [FIELD(name, Type, lenth, dec) for [name, Type, lenth, dec] in field_list]
+        if self.fields:
+            self.fields.insert(0, FIELD('del_flag', 'C', 1, 0))
+        else:
+            self.fields = [FIELD('del_flag', 'C', 1, 0)]
+
+
+    def write_to_stream(self, recodes):
+        recnum = len(recodes)
+        if not recnum:
+            return False
+        head_to_stream(self.stream, self.fields, recnum)
+        recode_to_stream(self.stream, self.fields, recodes)
+        return True
+
+    def stream_to_file(self, file_stream=None):
+        if not file_stream:
+            return  False
+        stream_len = len(self.stream)
+        file_stream.truncate(stream_len)
+        file_stream.seek(0)
+        file_stream.write(self.stream.getvalue())
+        return True
+
