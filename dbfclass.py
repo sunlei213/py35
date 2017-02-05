@@ -21,7 +21,7 @@ HEAD_FORMAT = '<BBBBLHH20x'
 FIELD_FORMAT = '<11sc4xBB14x'
 
 
-def recode_to_stream(f, fields, recodes):
+def recode_to_stream(f, fields, recodes, is_sse=True):
     """f is BytesIO, fields is list of field and first value is del_flag,
        recodes is a list of recode"""
     for reno, recode in enumerate(recodes, start=1):
@@ -33,7 +33,7 @@ def recode_to_stream(f, fields, recodes):
             if len(recode[i]) > field.lenth:
                 raise "记录{3:d}长度：{1:d}大于字段{0}设定长度：{2:d}，内容：{4}".format(
                     field.name, len(recode[i]), field.lenth, reno, recode[i])
-            if reno == 1 and i == 5:
+            if reno == 1 and i == 5 and is_sse:
                 value = str(recode[i])[:field.lenth].ljust(field.lenth, ' ').encode()
             elif field.type == 'N' or field.type == 'F':
                 value = str(recode[i]).rjust(field.lenth, ' ').encode()
@@ -91,7 +91,8 @@ class DbfSseWriter(object):
     def stream_to_file(self, file_stream=None):
         if not file_stream:
             return False
-        stream_len = len(self.stream)
+        self.stream.seek(0,2)
+        stream_len = len(self.stream.tell())
         file_stream.truncate(stream_len)
         file_stream.seek(0)
         file_stream.write(self.stream.getvalue())
