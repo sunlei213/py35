@@ -33,7 +33,7 @@ class Fast2Show:
         while line:
             yield line
             line = file_stream.readline()
- 
+
     def recode_strip(self, recodes):
         for recode in recodes:
             re = [value.strip() for value in recode]
@@ -161,6 +161,7 @@ class Fast2Show:
                                   '0', '0.0', '0', '0.0', '0', '0', '0.0', '0',
                                   '0.0', '0', '0.0', '0', '0.0', '0', '0.0',
                                   '0', '0.0', '0']
+
     def fjy_to_map(self, records):
         if len(records) == 0:
             return
@@ -211,5 +212,3 @@ class Fast2Show:
             objs.insert(0, False)
         objs[12] = ""
         self.dataMap[records[1]] = objs
-
-
