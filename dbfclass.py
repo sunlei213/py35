@@ -105,13 +105,11 @@ class DbfSseWriter(object):
     @fields.setter
     def fields(self, value):
         """
-
         :type value: list of field
         filed sample FIELD(name,type,length,dec)
         """
-        if len(value) == 0:
-            return
-        elif value[0].name != 'del_flag':
+        assert isinstance(value, list) and len(value) > 0,'value is a list of FIELD'
+        if value[0].name != 'del_flag':
             self.fields = [FIELD('del_flag', 'C', 1, 0)] + value
         else:
             self.fields = value

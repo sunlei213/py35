@@ -10,13 +10,29 @@
 @file: dbfclass.py
 @time: 2017/2/2 13:55
 """
+import dbfclass
+from time import clock
 
-sl1 = u'你好世界'
-print(sl1)
-sl2 = 4
-print('{0}.{1}'.format(sl2, sl1))
-sl1 = 4
-if sl1==4:
-    print(sl1)
-elif sl2 == 4:
-    print('hello wrld')
+
+def read_file(file_stream):
+    line = file_stream.readline()
+    while line:
+        yield line
+        line = file_stream.readline()
+
+
+def recode_strip(recodes):
+    for recode in recodes:
+        re = [value.strip() for value in recode]
+        yield re
+
+
+filename = r'd:\mktdt00.txt'
+start = clock()
+with open(filename) as f:
+    lines = [x.replace('\n', '').split('|') for x in f]
+lines = [x for x in recode_strip(lines)]
+end = clock()
+print ('开始时间：{0},结束时间：{1},用时：{2}'.format(start, end, end - start))
+for i in range(10):
+    print(lines[i])
