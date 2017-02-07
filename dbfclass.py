@@ -61,6 +61,7 @@ def recode_to_stream(f, fields, recodes, is_sse=True):
             f.write(value)
 
 
+
 def head_to_stream(f, fields, recnum):
     """f is BytesIO, fields is list of field, recnum is total recode"""
     # 写Dbf文件头
