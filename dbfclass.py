@@ -25,7 +25,7 @@ FIELD_FORMAT = '<11sc4xBB14x'
 def recode_to_stream(f, fields, recodes, is_sse=True):
     """f is BytesIO, fields is list of field and first value is del_flag,
        recodes is a list of recode"""
-
+    code_type = "gbk"
     for reno, recode in enumerate(recodes, start=1):
         for i, field in enumerate(fields):
             if i == 0:
@@ -33,12 +33,12 @@ def recode_to_stream(f, fields, recodes, is_sse=True):
                 f.write(del_flag)
                 continue
             if reno == 1 and i == 6 and is_sse:
-                value = str(recode[i])[:field.length].ljust(field.length, ' ').encode("gbk")
+                value = str(recode[i])[:field.length].ljust(field.length, ' ').encode(code_type)
             elif field.type == 'N' or field.type == 'F':
                 if len(str(recode[i])) == 0 or recode[i] is None:
                     value = "".join(['-' if field.length > 0 else "",
                                      '.' + '-' * field.dec if field.length > 0 and field.dec > 0 else ""]
-                                    ).rjust(field.length, ' ').encode("gbk")
+                                    ).rjust(field.length, ' ').encode(code_type)
                 else:
                     try:
                         # rec = Decimal(recode[i]).quantize(Decimal("{0:.{1}f}".format(1.0, field.dec)))
@@ -47,16 +47,16 @@ def recode_to_stream(f, fields, recodes, is_sse=True):
                         print("{0}，内容：{1},dec:{2}".format(repr(e), recode[i], field.dec))
                     if len(rec) > field.length:
                         rec = rec[0:field.length]
-                    value = rec.encode("gbk")  # .rjust(field.length, ' ')
+                    value = rec.encode(code_type)  # .rjust(field.length, ' ')
             elif field.type == 'D':
-                value = recode[i].strftime('%Y%m%d').encode("gbk")
+                value = recode[i].strftime('%Y%m%d').encode(code_type)
             elif field.type == 'L':
-                value = str(recode[i])[0].upper().encode("gbk")
+                value = str(recode[i])[0].upper().encode(code_type)
             else:
                 if len(str(recode[i])) > field.length:
                     raise Exception("记录{3:d}长度：{1:d}大于字段{0}设定长度：{2:d}，内容：{4}".format(
                         field.name, len(str(recode[i])), field.length, reno, recode[i]))
-                value = str(recode[i]).encode("gbk")[:field.length]
+                value = str(recode[i]).encode(code_type)[:field.length]
                 value += b' ' * (field.length - len(value))
             f.write(value)
 
@@ -65,6 +65,7 @@ def recode_to_stream(f, fields, recodes, is_sse=True):
 def head_to_stream(f, fields, recnum):
     """f is BytesIO, fields is list of field, recnum is total recode"""
     # 写Dbf文件头
+    code_type = "gbk"
     ver = 3
     now = datetime.datetime.now()
     yr, mon, day = [now.year - 1900, now.month, now.day]
@@ -78,8 +79,8 @@ def head_to_stream(f, fields, recnum):
     for field in fields:
         if field.name == "del_flag":
             continue
-        name = field.name.ljust(11, '\x00').encode("gbk")
-        fld = struct.pack(FIELD_FORMAT, name, field.type[0].encode("gbk"), field.length, field.dec)
+        name = field.name.ljust(11, '\x00').encode(code_type)
+        fld = struct.pack(FIELD_FORMAT, name, field.type[0].encode(code_type), field.length, field.dec)
         f.write(fld)
 
     # 结束文件头
