@@ -83,8 +83,8 @@ class Fast2Show:
         objs = [""] * 30
         objs[0] = "000000"
         objs[1] = line[6][9:17].replace(":", "") + "  "
-        objs[2] = Decimal(ag_price)
-        objs[3] = Decimal(bg_price)
+        objs[2] = float(ag_price)
+        objs[3] = float(bg_price)
         objs[4] = 0
         self.jyDate = line[6][0:8]
         objs[5] = self.jyDate
@@ -94,7 +94,7 @@ class Fast2Show:
         else:
             objs[10] = 0
             self.isClose = False
-        objs[11] = Decimal(zs_price)
+        objs[11] = float(zs_price)
         objs[12] = int(line[8][2])
         objs[14] = int(line[8][1])
         objs.insert(0, True)
@@ -107,47 +107,47 @@ class Fast2Show:
         if records[0] == "MD001":
             objs[0] = records[1]
             objs[1] = records[2]
-            objs[2] = Decimal(records[5])
-            objs[3] = Decimal(records[6])
+            objs[2] = float(records[5])
+            objs[3] = float(records[6])
             objs[4] = int(999999999999 if len(str(Decimal(records[4]).quantize(Decimal('1')))) > 12
                           else Decimal(records[4]).quantize(Decimal('1')))
-            objs[5] = Decimal(records[7])
-            objs[6] = Decimal(records[8])
-            objs[7] = Decimal(records[10] if self.isClose else records[9])
+            objs[5] = float(records[7])
+            objs[6] = float(records[8])
+            objs[7] = float(records[10] if self.isClose else records[9])
             objs[10] = int(records[3])
             objs[11] = True
         else:
             objs[0] = records[1]
             objs[1] = records[2]
-            objs[2] = Decimal(records[5])
-            objs[3] = Decimal(records[6])
+            objs[2] = float(records[5])
+            objs[3] = float(records[6])
             objs[4] = int(999999999999 if len(str(Decimal(records[4]).quantize(Decimal('1')))) > 12
                           else Decimal(records[4]).quantize(Decimal('1')))
-            objs[5] = Decimal(records[7])
-            objs[6] = Decimal(records[8])
-            objs[7] = Decimal(records[10] if self.isClose else records[9])
-            objs[8] = Decimal(records[11])
-            objs[9] = Decimal(records[13])
+            objs[5] = float(records[7])
+            objs[6] = float(records[8])
+            objs[7] = float(records[10] if self.isClose else records[9])
+            objs[8] = float(records[11])
+            objs[9] = float(records[13])
             objs[10] = int(records[3])
             st_tmp = records[33] if records[0] == "MD004" else records[31]
             objs[11] = not (st_tmp[0] != 'P' and st_tmp[2] == '1')
             objs[12] = int(records[12])
-            objs[13] = Decimal(records[15])
+            objs[13] = float(records[15])
             objs[14] = int(records[16])
-            objs[15] = Decimal(records[19])
+            objs[15] = float(records[19])
             objs[16] = int(records[20])
             objs[17] = int(records[14])
-            objs[18] = Decimal(records[17])
+            objs[18] = float(records[17])
             objs[19] = int(records[18])
-            objs[20] = Decimal(records[21])
+            objs[20] = float(records[21])
             objs[21] = int(records[22])
-            objs[22] = Decimal(records[23])
+            objs[22] = float(records[23])
             objs[23] = int(records[24])
-            objs[24] = Decimal(records[27])
+            objs[24] = float(records[27])
             objs[25] = int(records[28])
-            objs[26] = Decimal(records[25])
+            objs[26] = float(records[25])
             objs[27] = int(records[26])
-            objs[28] = Decimal(records[29])
+            objs[28] = float(records[29])
             objs[29] = int(records[30])
         if records[0] == "MD004":
             self.T1IOPVMap[records[1]] = records[31]
@@ -211,17 +211,17 @@ class Fast2Show:
             objs[11] = True
 
         if my_type in ("IS", "IN", "FS", "FC", "CR"):
-            objs[2] = Decimal(records[11])
+            objs[2] = float(records[11])
         elif my_type in ("PH", "KK", "HK"):
-            objs[2] = Decimal(records[11])
+            objs[2] = float(records[11])
             objs[11] = True
         elif my_type in ("R1", "R2", "R3", "R4"):
-            objs[2] = objs[3] = Decimal(records[11])
+            objs[2] = objs[3] = float(records[11])
         elif my_type == "CV":
             objs[2] = "100.000"
         elif my_type in ("OC", "OR"):
-            objs[2] = Decimal(records[24])
-            objs[7] = Decimal(records[25])
+            objs[2] = float(records[24])
+            objs[7] = float(records[25])
         elif my_type in ("OS", "BD", "BW"):
             objs[2] = "1.000"
         elif my_type in ("OT", "OD", "OV"):
@@ -229,10 +229,10 @@ class Fast2Show:
         elif my_type in ("EC", "ER"):
             t1 = self.T1IOPVMap[records[3]]
             if not t1:
-                objs[2] = Decimal(t1)
+                objs[2] = float(t1)
             t1 = self.IOPVMap[records[3]]
             if not t1:
-                objs[7] = Decimal(t1)
+                objs[7] = float(t1)
         elif my_type == "EZ":
             objs[11] = True
         elif my_id in ("799988", "799996", "799998", "799999", "939988"):
