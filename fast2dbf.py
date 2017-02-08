@@ -205,27 +205,27 @@ class Fast2Show:
         lines = [x for x in self.record_strip(lines)]
         for line in lines:
             self.fjy_to_map(line)
-        self._dataMap["888880"] = [True, "888880", u"新标准券", '1.0', '0.0', '0',
-                                  '0.0', '0.0', '0.0', '0.0', '0.0', '0', "",
-                                  '0', '0.0', '0', '0.0', '0', '0', '0.0', '0',
-                                  '0.0', '0', '0.0', '0', '0.0', '0', '0.0',
-                                  '0', '0.0', '0']
-        self._dataMap["799990"] = [True, '799990', u'市值股数', '1.0', '0.0', '0',
-                                  '0.0', '0.0', '0.0', '0.0', '0.0', '0', "",
-                                  '0', '0.0', '0', '0.0', '0', '0', '0.0', '0',
-                                  '0.0', '0', '0.0', '0', '0.0', '0', '0.0',
-                                  '0', '0.0', '0']
+        self._dataMap["888880"] = [True, "888880", "新标准券", 1.0, 0.0, 0,
+                                  0.0, 0.0, 0.0, 0.0, 0.0, 0, "",
+                                  0, 0.0, 0, 0.0, 0, 0, 0.0, 0,
+                                  0.0, 0, 0.0, 0, 0.0, 0, 0.0,
+                                  0, 0.0, 0]
+        self._dataMap["799990"] = [True, '799990', '市值股数', 1.0, 0.0, 0,
+                                  0.0, 0.0, 0.0, 0.0, 0.0, 0, "",
+                                  0, 0.0, 0, 0.0, 0, 0, 0.0, 0,
+                                  0.0, 0, 0.0, 0, 0.0, 0, 0.0,
+                                  0, 0.0, 0]
         self.fjy_time = clock() - start
         return True
 
     def fjy_to_map(self, records):
         if len(records) == 0:
             return
-        objs = ["", "", '0.0', '0.0', '0',
-                '0.0', '0.0', '0.0', '0.0', '0.0', '0', False,
-                '0', '0.0', '0', '0.0', '0', '0', '0.0', '0',
-                '0.0', '0', '0.0', '0', '0.0', '0', '0.0',
-                '0', '0.0', '0']
+        objs = ["", "",  1.0, 0.0, 0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0, False,
+                0, 0.0, 0, 0.0, 0, 0, 0.0, 0,
+                0.0, 0, 0.0, 0, 0.0, 0, 0.0,
+                0, 0.0, 0]
         my_type = records[5]
         my_id = records[1]
         objs[0] = my_id
@@ -243,14 +243,14 @@ class Fast2Show:
         elif my_type in ("R1", "R2", "R3", "R4"):
             objs[2] = objs[3] = float(records[11])
         elif my_type == "CV":
-            objs[2] = "100.000"
+            objs[2] = 100.000
         elif my_type in ("OC", "OR"):
             objs[2] = float(records[24])
             objs[7] = float(records[25])
         elif my_type in ("OS", "BD", "BW"):
-            objs[2] = "1.000"
+            objs[2] = 1.000
         elif my_type in ("OT", "OD", "OV"):
-            objs[2] = "0.000"
+            objs[2] = 0.000
         elif my_type in ("EC", "ER"):
             t1 = self.T1IOPVMap[records[3]]
             if not t1:
@@ -261,7 +261,7 @@ class Fast2Show:
         elif my_type == "EZ":
             objs[11] = True
         elif my_id in ("799988", "799996", "799998", "799999", "939988"):
-            objs[2] = "1.000"
+            objs[2] = 1.000
         if objs[11]:
             objs.insert(0, True)
         else:
