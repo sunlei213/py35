@@ -11,8 +11,10 @@
 @time: 2017/2/8 15:58
 """
 
-import time
+from time import sleep
 import tkinter as tk
+from  threading import *
+from multiprocessing import *
 
 class MainWindow:
     def __init__(self, title='nms', width=300, height=120, staFunc=bool, stoFunc=bool):
@@ -44,12 +46,12 @@ class MainWindow:
     def event(self):
         self.btnSer['state'] = 'disabled'
         if self.stat:
-            if self.stoFunc():
+            if self.stoFunc(self):
                 self.btnSer['text'] = '启动服务'
                 self.stat = False
                 self.root.iconbitmap(self.stoIco)
         else:
-            if self.staFunc():
+            if self.staFunc(self):
                 self.btnSer['text'] = '停止服务'
                 self.stat = True
                 self.root.iconbitmap(self.staIco)
@@ -63,17 +65,32 @@ class MainWindow:
         self.root.mainloop()
 
 ########################################################################
-def sta():
-    print('start.')
+def run_pro(cls1):
+    global run_stat
+    i = 0
+    while run_stat:
+        cls1.labl['text'] = '循环次数：{}'.format(i)
+        i += 1
+        sleep(3)
+
+def sta(cls1):
+    global run_stat
+    cls1.labl['text'] = '开始'
+    run_stat = True
+    mp = Process(target=run_pro, args=(cls1,))
+    mp.start()
     return True
-def sto():
-    print('stop.')
+def sto(cls1):
+    global run_stat
+    cls1.labl['text'] = '停止123456789012345678901234567890'
+    run_stat =  False
     return True
 
 if __name__ == '__main__':
     import sys, os
 
-    w = Window(staFunc=sta, stoFunc=sto)
+    run_stat = True
+    w = MainWindow(staFunc=sta, stoFunc=sto)
     w.staIco = os.path.join(sys.exec_prefix, 'DLLs\pyc.ico')
     w.stoIco = os.path.join(sys.exec_prefix, 'DLLs\py.ico')
     w.loop()
