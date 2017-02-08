@@ -42,7 +42,7 @@ def recode_to_stream(f, fields, recodes, is_sse=True):
                 else:
                     try:
                         # rec = Decimal(recode[i]).quantize(Decimal("{0:.{1}f}".format(1.0, field.dec)))
-                        rec = "{0: >{1}.{2}f}".format(float(recode[i]), field.length, field.dec)
+                        rec = "{0: >{1}.{2}f}".format(recode[i], field.length, field.dec)
                     except Exception as e:
                         print("{0}，内容：{1},dec:{2}".format(repr(e), recode[i], field.dec))
                     if len(rec) > field.length:
