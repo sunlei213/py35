@@ -10,33 +10,95 @@
 @file: dbfclass.py
 @time: 2017/2/2 13:55
 """
-import fast2dbf
-from time import sleep
-from datetime import datetime
+
+import sys
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
 
-if __name__ == '__main__':
-    samp = fast2dbf.Fast2Show()
-    i = 0
-    while 1:
-        if samp.write_mkt_to_show():
-            if samp.write_fjy_to_stream():
-                if samp.write_dbf():
-                    i += 1
-                    print("loop_{3}:Mtk转Map时间：{0:6.4f}，fjy转Map时间：{1:6.4f}，Map写盘时间：{2:6.4f}"
-                          .format(samp.mkt_time, samp.fjy_time, samp.dbf_time, i))
-                    now = datetime.now()
-                    if now.hour > 12 :
-                        break
-                else:
-                    print("写文件错误")
+class LcdTime(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super(LcdTime, self).__init__(parent)
+
+        self.hour = QtWidgets.QLCDNumber(8, self)
+        self.hour.setGeometry(10, 10, 200, 70)
+        self.hour.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
+        self.display()
+
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.display)
+        #self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.display)
+        self.timer.start(1000)
+
+        self.build_tray()
+        self.resize(220, 100)
+        self.central()
+        self.normal = True
+
+        # 边框透明
+        self.hour.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.SubWindow | QtCore.Qt.WindowStaysOnTopHint)
+        # 透明处理，移动需要拖动数字
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
+        self.setMouseTracking(True)
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.dragPosition = event.globalPos() - self.frameGeometry().topLeft()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() == QtCore.Qt.LeftButton:
+            self.move(event.globalPos() - self.dragPosition)
+            event.accept()
+
+    def build_tray(self):
+        self.trayIcon = QtWidgets.QSystemTrayIcon(self)
+        self.trayIcon.setIcon(QtGui.QIcon('test.png'))
+        self.trayIcon.show()
+        self.trayIcon.setToolTip('时钟 -LiKui')
+        self.trayIcon.activated.connect(self.trayClick)
+
+        menu = QtWidgets.QMenu()
+        normalAction = menu.addAction('正常显示')
+        miniAction = menu.addAction('最小化托盘')
+        exitAction = menu.addAction('退出')
+        normalAction.triggered.connect(self.showNormal)
+        exitAction.triggered.connect(self.exit)
+        miniAction.triggered.connect(self.showMinimized)
+
+        self.trayIcon.setContextMenu(menu)
+
+    def exit(self):
+        # 不设置Visible为False，退出后TrayIcon不会刷新
+        self.trayIcon.setVisible(False)
+        sys.exit(0)
+
+    def trayClick(self, reason):
+        if reason == QtWidgets.QSystemTrayIcon.DoubleClick:
+            if self.normal:
+                self.showMinimized()
             else:
-                print("读fjy错误")
-        else:
-            print("读mkt错误")
-        tm = 5.0 - samp.mkt_time - samp.fjy_time - samp.dbf_time
-        if tm < 0:
-            tm = 0.1
-        print("延迟{0:.4f}秒".format(tm))
-        sleep(tm)
+                self.showNormal()
+                self.repaint()
+            self.normal = not self.normal
 
+    def display(self):
+        current = QtCore.QTime.currentTime()
+        self.hour.display(current.toString('HH:mm:ss'))
+
+    def showNormal(self):
+        super(LcdTime, self).showNormal()
+        self.repaint()
+
+    def central(self):
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        self.move(screen.width() - size.width(), 0)
+
+
+app = QtWidgets.QApplication(sys.argv)
+lcd = LcdTime()
+lcd.show()
+sys.exit(app.exec_())
