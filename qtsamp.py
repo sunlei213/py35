@@ -7,6 +7,9 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from multiprocessing import *
+from queue import Empty
+from time import sleep
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -31,10 +34,15 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.timer = QtCore.QTimer(self.centralwidget)
+        self.time_stat = False
+        self.in_queue = Queue()
+        self.out_queue = Queue()
 
         self.retranslateUi(MainWindow)
         self.pushButton.clicked.connect(MainWindow.close)
         self.pushButton_2.clicked.connect(self.chang_lab)
+        self.timer.timeout.connect(self.time_out)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -42,9 +50,44 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label.setText(_translate("MainWindow", "TextLabel"))
         self.pushButton.setText(_translate("MainWindow", "Quit"))
-        self.pushButton_2.setText(_translate("MainWindow", "chang"))
+        self.pushButton_2.setText(_translate("MainWindow", "Start"))
 
     def chang_lab(self):
-        self.label.setText("改变文字")
+        print("chang_lab")
+        if self.time_stat:
+            self.timer.stop()
+            self.in_queue.put(False)
+            self.pushButton_2.setText("Start")
+        else:
+            self.timer.start(500)
+            self.pushButton_2.setText("Stop")
+            mp = Process(target=run_pro, args=(self.in_queue, self.out_queue))
+            mp.daemon =True
+            mp.start()
+            print("进程运行")
+        self.time_stat = not self.time_stat
+
+    def time_out(self):
+        try:
+            tm = self.out_queue.get_nowait()
+            self.label.setText("已经运行了{0:0>5}秒".format(tm))
+        except Empty:
+            pass
+
+
+def run_pro(in_queue, out_queue):
+    run_stat = True
+    print("进程开始")
+    i = 0
+    while run_stat:
+        out_queue.put(i)
+        i += 1
+        try:
+            run_stat = in_queue.get_nowait()
+        except Empty:
+            pass
+        sleep(1)
+    print('进程结束')
+
 
 
