@@ -11,7 +11,7 @@ from multiprocessing import *
 from queue import Empty
 from time import sleep
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(object):                                               #Qt Designer设计的窗口
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(726, 541)
@@ -34,15 +34,15 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.timer = QtCore.QTimer(self.centralwidget)
+        self.timer = QtCore.QTimer(self.centralwidget)                    #自行添加的时钟类
         self.time_stat = False
-        self.in_queue = Queue()
+        self.in_queue = Queue()                                           #和进程通信的队列
         self.out_queue = Queue()
 
         self.retranslateUi(MainWindow)
         self.pushButton.clicked.connect(MainWindow.close)
-        self.pushButton_2.clicked.connect(self.chang_lab)
-        self.timer.timeout.connect(self.time_out)
+        self.pushButton_2.clicked.connect(self.b2_click)
+        self.timer.timeout.connect(self.time_out)                          #时钟的信息槽slot，timeout为延迟结束信号
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -52,7 +52,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Quit"))
         self.pushButton_2.setText(_translate("MainWindow", "Start"))
 
-    def chang_lab(self):
+    def b2_click(self):                                                  #button2按下后的处理函数
         print("chang_lab")
         if self.time_stat:
             self.timer.stop()
@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
         else:
             self.timer.start(500)
             self.pushButton_2.setText("Stop")
-            mp = Process(target=run_pro, args=(self.in_queue, self.out_queue))
+            mp = Process(target=run_pro, args=(self.in_queue, self.out_queue))  #子进程建立
             mp.daemon =True
             mp.start()
             print("进程运行")
@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
             pass
 
 
-def run_pro(in_queue, out_queue):
+def run_pro(in_queue, out_queue):                           #进程函数不能是类函数
     run_stat = True
     print("进程开始")
     i = 0

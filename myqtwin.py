@@ -16,10 +16,10 @@ from PyQt5 import QtWidgets
 from qtsamp import Ui_MainWindow
 
 
-class mywindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, parent = None):
+class mywindow(QtWidgets.QMainWindow, Ui_MainWindow):  #主窗口类（继承QT的主窗口类和设计的UI类）
+    def __init__(self, parent = None):                 #初始化
         super(mywindow, self).__init__(parent)
-        self.setupUi(self)
+        self.setupUi(self)                             #UI界面设置
 
 
 if __name__ == "__main__":
