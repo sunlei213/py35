@@ -24,9 +24,9 @@ class Fast2Show:
         self.T1IOPVMap = {}
         self.IOPVMap = {}
         self._dataMap = {}
-        self._mtk_path = r'd:'
-        self._fjy_path = r'd:'
-        self._dbf_path = r'd:'
+        self._mtk_path = r'd:/'
+        self._fjy_path = r'd:/'
+        self._dbf_path = r'd:/'
         self._isClose = False
         self._jyDate = ""
         self.mkt_time = 0
@@ -157,7 +157,7 @@ class Fast2Show:
             objs[9] = float(records[13])
             objs[10] = int(records[3])
             st_tmp = records[33] if records[0] == "MD004" else records[31]
-            objs[11] = not (st_tmp[0] != 'P' and st_tmp[2] == '1')
+            objs[11] = True if len(st_tmp)<3 else (not (st_tmp[0] != 'P' and st_tmp[2] == '1'))
             objs[12] = int(records[12])
             objs[13] = float(records[15])
             objs[14] = int(records[16])

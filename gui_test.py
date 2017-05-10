@@ -13,8 +13,9 @@
 
 from time import sleep
 import tkinter as tk
-from multiprocessing import *
-from queue import Empty
+#from multiprocessing import *
+from threading import Thread
+from queue import Empty,Queue
 import fast2dbf
 from datetime import datetime
 
@@ -89,6 +90,7 @@ def run_pro(que1, que2):
     run_stat = True
     samp = fast2dbf.Fast2Show()
     i = 0
+    print('进程开始')
     while run_stat:
         if samp.write_mkt_to_show():
             if samp.write_fjy_to_stream():
@@ -112,6 +114,7 @@ def run_pro(que1, que2):
         except Empty:
             pass
         sleep(tm)
+    print('进程结束')
 
 def sta(cls1, que1, que2):
     cls1.labl['text'] = '开始'
@@ -119,7 +122,8 @@ def sta(cls1, que1, que2):
         que2.get_nowait()
     except Empty:
         pass
-    mp = Process(target=run_pro, args=(que1, que2))
+    mp = Thread(target=run_pro, args=(que1, que2))
+    mp.daemon = True
     mp.start()
     return True
 
